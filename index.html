@@ -3,29 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generador de QR con Logo</title>
+<title>QR Generator</title>
+
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%23667eea'/><stop offset='100%' stop-color='%23764ba2'/></linearGradient></defs><rect width='90' height='90' x='5' y='5' rx='15' fill='url(%23grad)'/><rect width='25' height='25' x='15' y='15' fill='white'/><rect width='25' height='25' x='60' y='15' fill='white'/><rect width='25' height='25' x='15' y='60' fill='white'/><rect width='25' height='25' x='60' y='60' fill='white'/><rect width='10' height='10' x='45' y='45' fill='white'/></svg>">
+
+
+
+
+
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
     :root {
-        --bg-color: #ffffff;
-        --text-color: #333;
-        --container-bg: #f5f5f5;
-        --button-bg: #311e77;
-        --button-color: #fff;
-        --button-hover: #171870;
-    }
-
-    body.dark {
         --bg-color: #0f0f0f;
         --text-color: #eee;
         --container-bg: #1c1c1c;
         --button-bg: #667eea;
         --button-color: #fff;
         --button-hover: #5463ff;
+        --border-color: #333;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
 
     body {
         background: var(--bg-color);
@@ -44,35 +45,85 @@
         padding: 30px 25px;
         width: 100%;
         max-width: 500px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        border: 1px solid var(--border-color);
         transition: all 0.3s;
     }
 
-    h1 { text-align: center; margin-bottom: 20px; font-size: 26px; }
+    .header {
+        text-align: center;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .logo {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    h1 {
+        font-size: 26px;
+        background: linear-gradient(to right, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
 
     .input-group { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 6px; font-weight: bold; }
-    textarea, select {
-        width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #ccc;
-        font-size: 16px; resize: vertical; transition: border-color 0.3s;
+    label { display: block; margin-bottom: 6px; font-weight: 600; color: #ccc; }
+    textarea, select, input[type="file"] {
+        width: 100%; 
+        padding: 12px; 
+        border-radius: 10px; 
+        border: 2px solid var(--border-color);
+        font-size: 16px; 
+        resize: vertical; 
+        transition: border-color 0.3s;
+        background: #2a2a2a;
+        color: var(--text-color);
     }
-    textarea:focus, select:focus { border-color: var(--button-bg); outline: none; }
+    
+    textarea:focus, select:focus {
+        border-color: var(--button-bg); 
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
 
     .qr-container {
         text-align: center;
         margin: 20px 0;
         padding: 15px;
-        border: 2px dashed #ccc;
+        border: 2px dashed var(--border-color);
         border-radius: 10px;
         min-height: 260px;
-        display: flex; justify-content: center; align-items: center;
+        display: flex; 
+        justify-content: center; 
+        align-items: center;
         position: relative;
         overflow: hidden;
-        background: #fff;
+        background: #2a2a2a;
     }
 
     #qrcode { max-width: 100%; display: none; }
-    .buttons { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+    
+    .buttons { 
+        display: flex; 
+        gap: 10px; 
+        margin-top: 15px; 
+        flex-wrap: wrap; 
+    }
+    
     button {
         flex: 1;
         padding: 12px;
@@ -84,43 +135,75 @@
         transition: all 0.3s;
         color: var(--button-color);
         background: var(--button-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
     }
-    button:hover { background: var(--button-hover); transform: translateY(-2px); }
+    
+    button:hover { 
+        background: var(--button-hover); 
+        transform: translateY(-2px); 
+        box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+    }
+    
     button:active { transform: translateY(0); }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .hidden { display: none; }
+    
+    .hidden { display: none !important; }
+    
     .notification {
-        position: fixed; top: 20px; right: 20px; padding: 12px 18px;
-        border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        z-index: 9999; color: #fff; animation: slideIn 0.3s ease;
+        position: fixed; 
+        top: 20px; 
+        right: 20px; 
+        padding: 12px 18px;
+        border-radius: 8px; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 9999; 
+        color: #fff; 
+        animation: slideIn 0.3s ease;
+        font-weight: 500;
     }
+    
     .notification.error { background: #f44336; }
     .notification.success { background: #4CAF50; }
     .notification.info { background: #2196F3; }
 
-    @keyframes slideIn { from { transform: translateX(100%); opacity:0;} to { transform: translateX(0); opacity:1; } }
+    @keyframes slideIn { 
+        from { transform: translateX(100%); opacity:0;} 
+        to { transform: translateX(0); opacity:1; } 
+    }
+
+    #placeholder {
+        color: #888;
+        font-style: italic;
+        padding: 20px;
+    }
 
     @media (max-width: 600px) {
         h1 { font-size: 22px; }
         .buttons { flex-direction: column; }
+        .logo { width: 40px; height: 40px; font-size: 20px; }
     }
 
-    #themeToggle {
-        margin-bottom: 15px;
-        background: #888; color: #fff;
-        font-size: 12px; padding: 6px; width: 100%;
+    .file-info {
+        margin-top: 5px;
+        font-size: 14px;
+        color: #aaa;
+        display: none;
     }
 </style>
 </head>
 <body>
 <div class="container">
-    <h1>Generador de QR con Logo</h1>
-    <button id="themeToggle">Cambiar Modo</button>
+    <div class="header">
+        <div class="logo">QR</div>
+        <h1>Generador de QR</h1>
+    </div>
 
     <div class="input-group">
         <label for="qrText">Texto o URL:</label>
-        <textarea id="qrText" placeholder="Introduce texto, URL, email, teléfono, WiFi..."></textarea>
+        <textarea id="qrText" placeholder="Introduce texto, URL, email, teléfono, WiFi..." rows="3">https://ejemplo.com</textarea>
     </div>
 
     <div class="input-group">
@@ -135,17 +218,24 @@
     <div class="input-group">
         <label for="logoInput">Logo (opcional):</label>
         <input type="file" id="logoInput" accept="image/*">
+        <div class="file-info" id="fileInfo"></div>
     </div>
 
     <div class="qr-container">
-        <div id="placeholder">Aquí aparecerá tu QR</div>
+        <div id="placeholder">Aquí aparecerá tu código QR generado</div>
         <div id="qrcode"></div>
     </div>
 
     <div class="buttons">
-        <button id="generateBtn">Generar QR</button>
-        <button id="downloadBtn" class="hidden" disabled>Descargar QR</button>
-        <button id="clearBtn" class="hidden">Limpiar</button>
+        <button id="generateBtn">
+            <span>🔳</span> Generar QR
+        </button>
+        <button id="downloadBtn" class="hidden" disabled>
+            <span>⬇️</span> Descargar QR
+        </button>
+        <button id="clearBtn" class="hidden">
+            <span>🗑️</span> Limpiar
+        </button>
     </div>
 </div>
 
@@ -161,21 +251,33 @@ const generateBtn = document.getElementById('generateBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 const clearBtn = document.getElementById('clearBtn');
 const logoInput = document.getElementById('logoInput');
-const themeToggle = document.getElementById('themeToggle');
+const fileInfo = document.getElementById('fileInfo');
 
+// Manejo del logo
 logoInput.addEventListener('change', function(e){
     const file = e.target.files[0];
     if(file){
+        // Mostrar información del archivo
+        fileInfo.textContent = `Archivo: ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+        fileInfo.style.display = 'block';
+        
         const reader = new FileReader();
-        reader.onload = function(ev){ logoDataURL = ev.target.result; }
+        reader.onload = function(ev){ 
+            logoDataURL = ev.target.result; 
+        }
         reader.readAsDataURL(file);
-    } else { logoDataURL = null; }
+    } else { 
+        logoDataURL = null; 
+        fileInfo.style.display = 'none';
+    }
 });
 
-themeToggle.addEventListener('click', ()=>{
-    document.body.classList.toggle('dark');
+// Generar QR al cargar la página
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(generateQR, 500);
 });
 
+// Eventos de botones
 generateBtn.addEventListener('click', generateQR);
 downloadBtn.addEventListener('click', downloadQR);
 clearBtn.addEventListener('click', clearQR);
@@ -190,36 +292,64 @@ function generateQR(){
     placeholder.style.display = 'none';
 
     const canvas = document.createElement('canvas');
-    canvas.width = size; canvas.height = size;
+    canvas.width = size; 
+    canvas.height = size;
     const ctx = canvas.getContext('2d');
 
+    // Crear QR temporal
     const tempDiv = document.createElement('div');
-    new QRCode(tempDiv, { text, width:size, height:size, correctLevel:QRCode.CorrectLevel.H });
+    new QRCode(tempDiv, { 
+        text, 
+        width: size, 
+        height: size, 
+        correctLevel: QRCode.CorrectLevel.H,
+        colorDark: "#667eea",
+        colorLight: "#2a2a2a"
+    });
 
-    setTimeout(()=>{
+    setTimeout(() => {
         const qrCanvas = tempDiv.querySelector('canvas');
         if(!qrCanvas) return showNotification('Error generando QR', 'error');
 
-        ctx.drawImage(qrCanvas,0,0,size,size);
+        // Dibujar QR en el canvas
+        ctx.drawImage(qrCanvas, 0, 0, size, size);
 
+        // Si hay logo, agregarlo al centro
         if(logoDataURL){
             const img = new Image();
             img.src = logoDataURL;
             img.onload = function(){
-                const logoSize = size*0.2;
-                ctx.drawImage(img,(size-logoSize)/2,(size-logoSize)/2,logoSize,logoSize);
+                const logoSize = size * 0.2;
+                const xPos = (size - logoSize) / 2;
+                const yPos = (size - logoSize) / 2;
+                
+                // Crear fondo blanco para el logo
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(xPos - 4, yPos - 4, logoSize + 8, logoSize + 8);
+                
+                // Dibujar el logo
+                ctx.drawImage(img, xPos, yPos, logoSize, logoSize);
                 renderCanvas(canvas);
             }
-        } else { renderCanvas(canvas); }
-    },100);
+            img.onerror = function() {
+                showNotification('Error cargando logo', 'error');
+                logoDataURL = null;
+                renderCanvas(canvas);
+            };
+        } else { 
+            renderCanvas(canvas); 
+        }
+    }, 100);
 }
 
 function renderCanvas(canvas){
-    qrcodeDiv.innerHTML=''; qrcodeDiv.appendChild(canvas);
-    downloadBtn.classList.remove('hidden'); downloadBtn.disabled=false;
+    qrcodeDiv.innerHTML = ''; 
+    qrcodeDiv.appendChild(canvas);
+    downloadBtn.classList.remove('hidden'); 
+    downloadBtn.disabled = false;
     clearBtn.classList.remove('hidden');
-    currentQR={text: qrText.value, size: parseInt(qrSize.value)};
-    showNotification('QR generado', 'success');
+    currentQR = {text: qrText.value, size: parseInt(qrSize.value)};
+    showNotification('QR generado con éxito', 'success');
 }
 
 function downloadQR(){
@@ -227,24 +357,42 @@ function downloadQR(){
     const canvas = qrcodeDiv.querySelector('canvas');
     if(!canvas) return showNotification('Error descargando', 'error');
 
-    const link=document.createElement('a');
-    link.download=`QR_${Date.now()}.png`;
-    link.href=canvas.toDataURL();
-    document.body.appendChild(link); link.click(); link.remove();
+    const link = document.createElement('a');
+    link.download = `QR_${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png', 1.0);
+    document.body.appendChild(link); 
+    link.click(); 
+    link.remove();
+    
+    showNotification('QR descargado', 'success');
 }
 
 function clearQR(){
-    qrcodeDiv.innerHTML=''; placeholder.style.display='block'; qrcodeDiv.style.display='none';
-    qrText.value=''; logoInput.value=''; logoDataURL=null;
-    downloadBtn.classList.add('hidden'); clearBtn.classList.add('hidden');
-    currentQR=null;
-    showNotification('QR limpiado', 'info');
+    qrcodeDiv.innerHTML = ''; 
+    placeholder.style.display = 'block'; 
+    qrcodeDiv.style.display = 'none';
+    qrText.value = ''; 
+    logoInput.value = ''; 
+    logoDataURL = null;
+    fileInfo.style.display = 'none';
+    downloadBtn.classList.add('hidden'); 
+    clearBtn.classList.add('hidden');
+    currentQR = null;
+    showNotification('Formulario limpiado', 'info');
 }
 
-function showNotification(msg,type='success'){
-    const old=document.querySelector('.notification'); if(old) old.remove();
-    const n=document.createElement('div'); n.className=`notification ${type}`; n.textContent=msg;
-    document.body.appendChild(n); setTimeout(()=>{ n.remove(); },3000);
+function showNotification(msg, type = 'success'){
+    const old = document.querySelector('.notification'); 
+    if(old) old.remove();
+    
+    const n = document.createElement('div'); 
+    n.className = `notification ${type}`; 
+    n.textContent = msg;
+    document.body.appendChild(n); 
+    
+    setTimeout(() => { 
+        if(n.parentNode) n.parentNode.removeChild(n); 
+    }, 3000);
 }
 </script>
 </body>
